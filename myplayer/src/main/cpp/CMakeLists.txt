@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.4.1)
 include_directories(include)
 
 # D:\android\MyApplication\myplayer\src\main\jniLibs
-
+# E:\android\ProjectSpaces\StudioProjects\FfmpegSummary\myplayer\src\main\jniLibs
 set(
-        lib_dir D:/android/MyApplication/myplayer/src/main/jniLibs/${ANDROID_ABI}
+        lib_dir E:/android/ProjectSpaces/StudioProjects/FfmpegSummary/myplayer/src/main/jniLibs/${ANDROID_ABI}
 )
 
 add_library( # Sets the name of the library.
@@ -15,7 +15,8 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        native-lib.cpp)
+        native-lib.cpp
+        MyAudio.cpp)
 
 add_library(avcodec-57 SHARED IMPORTED)
 set_target_properties(avcodec-57

@@ -4,16 +4,15 @@ import android.text.TextUtils;
 import android.util.Log;
 
 /**
- * Created by 肖坤 on 2019/12/2.
+ * Created by xiaokun on 2019/12/9.
  *
- * @author 肖坤
- * @date 2019/12/2
+ * @author xiaokun
+ * @date 2019/12/9
  */
-public class Demo {
+public class Player {
 
-    private static final String TAG = "Demo";
+    private static final String TAG = "Player";
 
-    // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
         System.loadLibrary("avutil-55");
@@ -26,13 +25,9 @@ public class Demo {
         System.loadLibrary("avdevice-57");
     }
 
-    //public native String stringFromJNI();
-
-    public native void testFFmpeg();
-
     private String source;
 
-    public Demo() {
+    public Player() {
     }
 
     public void setSource(String source) {
@@ -69,6 +64,13 @@ public class Demo {
         }
     }
 
-    public native void n_prepared(String source);
+    private native void n_prepared(String source);
+
+
+    public void start() {
+        n_start();
+    }
+
+    private native void n_start();
 
 }
