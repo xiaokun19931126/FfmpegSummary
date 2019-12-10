@@ -16,6 +16,7 @@ extern "C" {
 pthread_t decodeThread = NULL;
 AVFormatContext *avFormatContext = NULL;
 MyAudio *myAudio;
+PlayStatus *playStatus;
 _JavaVM *javaVm;
 jmethodID jmethodId;
 JNIEnv *jniEnv;
@@ -23,6 +24,17 @@ jobject jobj;
 jstring urlStr;
 
 bool getResult(char *url);
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    LOGD("执行JNI_Onload1");
+    JNIEnv *env;
+    javaVm = vm;
+    if (vm->GetEnv((void **) (&env), JNI_VERSION_1_6) != JNI_OK) {
+        return -1;
+    }
+    LOGD("执行JNI_Onload2");
+    return JNI_VERSION_1_6;
+}
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -59,8 +71,8 @@ void *onPrepareCallback(void *data) {
             }
         } else {
             LOGD("c++调用java方法1");
-            LOGD("jobj 地址:%#p", jobj);
-            LOGD("jmethodId 地址:%#p", jmethodId);
+            LOGD("jobj 地址:%p", jobj);
+            LOGD("jmethodId 地址:%p", jmethodId);
             //c++调用java方法
             jniEnv->CallVoidMethod(jobj, jmethodId, urlStr);
             LOGD("c++调用java方法2");
@@ -102,7 +114,10 @@ bool getResult(char *url) {
         if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {//得到音频流
             LOGD("getResult3.6");
             if (myAudio == NULL) {
-                myAudio = new MyAudio();
+                if (playStatus == NULL) {
+                    playStatus = new PlayStatus();
+                }
+                myAudio = new MyAudio(playStatus);
                 myAudio->streamIndex = i;
                 myAudio->codecParam = avFormatContext->streams[i]->codecpar;
             }
@@ -170,17 +185,6 @@ Java_com_xiaokun_myplayer_Demo_n_1prepared(JNIEnv *env, jobject thiz, jstring so
     env->ReleaseStringUTFChars(source, url);
 }
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    LOGD("执行JNI_Onload1");
-    JNIEnv *env;
-    javaVm = vm;
-    if (vm->GetEnv((void **) (&env), JNI_VERSION_1_6) != JNI_OK) {
-        return -1;
-    }
-    LOGD("执行JNI_Onload2");
-    return JNI_VERSION_1_6;
-}
-
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_xiaokun_myplayer_Player_n_1prepared(JNIEnv *env, jobject thiz, jstring source) {
@@ -231,17 +235,36 @@ Java_com_xiaokun_myplayer_Player_n_1start(JNIEnv *env, jobject thiz) {
                 if (LOG_IS_DEBUG) {
                     LOGD("解码第 %d 帧", count);
                 }
+                //入队列中
+                myAudio->queue->putAvPacket(avPacket);
+            } else {
+                av_packet_free(&avPacket);
+                av_free(avPacket);
             }
-            av_packet_free(&avPacket);
-            av_free(avPacket);
         } else {
             if (LOG_IS_DEBUG) {
-                LOGD("解码完成");
+                //此次是测试全部帧入队列,若是生产环境中不可如此执行,以免造成内存溢出
+                LOGD("音频帧全部入队完成");
             }
             av_packet_free(&avPacket);
             av_free(avPacket);
             break;
         }
+    }
+
+    LOGD("队列个数：%d", myAudio->queue->getQueueSize());
+
+    //模拟出队
+    while (myAudio->queue->getQueueSize() > 0) {
+        AVPacket *packet = av_packet_alloc();
+        myAudio->queue->getAvPacket(packet);
+        av_packet_free(&packet);
+        av_free(packet);
+        packet = NULL;
+    }
+
+    if (LOG_IS_DEBUG) {
+        LOGD("解码完成");
     }
 
 }

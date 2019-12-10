@@ -6,6 +6,9 @@
 #define MY_APPLICATION_MYAUDIO_H
 
 
+#include "PlayStatus.h"
+#include "Queue.h"
+
 extern "C" {
 #include "include/libavcodec/avcodec.h"
 }
@@ -17,8 +20,10 @@ public:
     AVCodecContext *avCodecContext;
     AVCodecParameters *codecParam;
 
+    PlayStatus *playStatus = NULL;
+    Queue *queue = NULL;
 public:
-    MyAudio();
+    MyAudio(PlayStatus *status);
 
     ~MyAudio();
 };

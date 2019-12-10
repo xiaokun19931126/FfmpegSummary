@@ -16,7 +16,9 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
         native-lib.cpp
-        MyAudio.cpp)
+        MyAudio.cpp
+        Queue.cpp
+        PlayStatus.cpp)
 
 add_library(avcodec-57 SHARED IMPORTED)
 set_target_properties(avcodec-57

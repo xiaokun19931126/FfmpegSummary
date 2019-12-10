@@ -17,7 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Player mPlayer;
 
-    private String source = "http://ws.stream.qqmusic.qq.com/M5000020VnHM0U9uNh.mp3?guid=659972215&vkey=208810730C71B5A11024D35EBCC467D4A4C5A35A1CE91D194D56FC37B865916DF36A55543C111DB8D4E19E46EA52EAA8D77D76E5F71A6A2E&uin=0&fromtag=66";
+    private String source = "http://m7.music.126.net/20191210173138/469d91f29f12dd65fa2eb1b148549183/ymusic/0152/055a/5308/681ef6f50f20971ac5bddb07161fc6b5.mp3";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mPlayer = new Player();
-        mPlayer.setSource(source);
+        mPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+        //mPlayer.setSource(source);
 
         mPlayer.setFOnPrepareListener(new FOnPrepareListener() {
             @Override

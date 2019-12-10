@@ -4,8 +4,9 @@
 
 #include "MyAudio.h"
 
-MyAudio::MyAudio() {
-
+MyAudio::MyAudio(PlayStatus *status) {
+    this->playStatus = status;
+    this->queue = new Queue(playStatus);
 }
 
 MyAudio::~MyAudio() {
